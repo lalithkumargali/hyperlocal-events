@@ -1,0 +1,40 @@
+{
+  "events": [
+    {
+      "id": "123456789",
+      "name": {
+        "text": "Tech Conference 2025"
+      },
+      "description": {
+        "text": "Annual technology conference featuring industry leaders"
+      },
+      "start": {
+        "utc": "2025-11-15T09:00:00Z"
+      },
+      "end": {
+        "utc": "2025-11-15T17:00:00Z"
+      },
+      "category": {
+        "name": "Technology"
+      },
+      "subcategory": {
+        "name": "Software"
+      },
+      "format": {
+        "name": "Conference"
+      },
+      "venue": {
+        "name": "Convention Center",
+        "latitude": "37.7749",
+        "longitude": "-122.4194",
+        "address": {
+          "localized_address_display": "123 Main St, San Francisco, CA 94102"
+        }
+      },
+      "url": "https://www.eventbrite.com/e/tech-conference-2025-tickets-123456789",
+      "capacity": 500,
+      "is_online_event": false,
+      "is_series": false
+    }
+  ]
+}

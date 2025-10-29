@@ -1,0 +1,42 @@
+{
+  "events": [
+    {
+      "id": "abc123xyz",
+      "name": "Weekend Hiking Adventure",
+      "description": "Join us for a scenic hike through local trails",
+      "time": 1730620800000,
+      "duration": 14400000,
+      "venue": {
+        "name": "Trailhead Parking",
+        "lat": 37.7694,
+        "lon": -122.4862,
+        "address_1": "Golden Gate Park",
+        "city": "San Francisco",
+        "state": "CA"
+      },
+      "group": {
+        "name": "SF Hiking Group",
+        "lat": 37.7694,
+        "lon": -122.4862,
+        "category": {
+          "shortname": "outdoors"
+        },
+        "topics": [
+          {
+            "name": "Hiking"
+          },
+          {
+            "name": "Nature"
+          },
+          {
+            "name": "Fitness"
+          }
+        ]
+      },
+      "link": "https://www.meetup.com/sf-hiking/events/abc123xyz",
+      "yes_rsvp_count": 35,
+      "waitlist_count": 5,
+      "featured": false
+    }
+  ]
+}

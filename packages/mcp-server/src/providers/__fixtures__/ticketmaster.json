@@ -1,0 +1,67 @@
+{
+  "_embedded": {
+    "events": [
+      {
+        "id": "TM123456",
+        "name": "Rock Concert",
+        "info": "Amazing live rock performance",
+        "dates": {
+          "start": {
+            "dateTime": "2025-12-01T20:00:00Z"
+          },
+          "end": {
+            "dateTime": "2025-12-01T23:00:00Z"
+          }
+        },
+        "classifications": [
+          {
+            "segment": {
+              "name": "Music"
+            },
+            "genre": {
+              "name": "Rock"
+            },
+            "subGenre": {
+              "name": "Alternative Rock"
+            }
+          }
+        ],
+        "_embedded": {
+          "venues": [
+            {
+              "name": "City Arena",
+              "location": {
+                "latitude": "37.7833",
+                "longitude": "-122.4089"
+              },
+              "address": {
+                "line1": "456 Concert Blvd"
+              },
+              "city": {
+                "name": "San Francisco"
+              },
+              "state": {
+                "stateCode": "CA"
+              }
+            }
+          ]
+        },
+        "url": "https://www.ticketmaster.com/rock-concert-tickets/event/TM123456",
+        "images": [
+          {
+            "url": "https://example.com/image.jpg"
+          }
+        ],
+        "priceRanges": [
+          {
+            "min": 50,
+            "max": 150
+          }
+        ],
+        "promoter": {
+          "name": "Live Nation"
+        }
+      }
+    ]
+  }
+}

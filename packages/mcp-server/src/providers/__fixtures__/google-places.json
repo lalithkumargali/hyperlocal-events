@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "place_id": "ChIJabcdef123456",
+      "name": "Modern Art Museum",
+      "geometry": {
+        "location": {
+          "lat": 37.7858,
+          "lng": -122.4006
+        }
+      },
+      "types": ["museum", "art_gallery", "tourist_attraction", "point_of_interest"],
+      "vicinity": "151 Third St, San Francisco",
+      "rating": 4.5,
+      "user_ratings_total": 2500,
+      "opening_hours": {
+        "open_now": true
+      },
+      "editorial_summary": {
+        "overview": "Contemporary art museum featuring rotating exhibitions and installations"
+      }
+    }
+  ]
+}

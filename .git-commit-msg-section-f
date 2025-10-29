@@ -1,0 +1,78 @@
+feat(mcp): provider connectors with unified shape + tests
+
+Implement 4 provider connectors with unified event shape, rate limiting, and comprehensive tests.
+
+Providers:
+1. Eventbrite - OAuth token authentication
+   - Rate limit: 1000 requests/hour (~0.28/sec)
+   - Events with venues, categories, capacity
+   - Popularity based on capacity, online status, series
+
+2. Ticketmaster - API key authentication
+   - Rate limit: 5000 requests/day (~0.06/sec)
+   - Events with classifications, genres, venues
+   - Popularity based on images, prices, promoter
+
+3. Meetup - Bearer token authentication
+   - Rate limit: 200 requests/hour (~0.055/sec)
+   - Meetups with groups, topics, venues
+   - Popularity based on RSVPs, waitlist, featured status
+
+4. Google Places - API key authentication (POIs)
+   - Rate limit: Conservative (1/sec)
+   - POI types: museums, parks, galleries, stadiums, etc.
+   - Popularity based on ratings, reviews, open status
+
+Unified Event Shape:
+- provider: enum (eventbrite|ticketmaster|meetup|google-places)
+- providerId: string (provider's unique ID)
+- title: string
+- description?: string
+- category: string[] (normalized categories)
+- startAt?: string (ISO 8601)
+- endAt?: string (ISO 8601)
+- venue: { name?, lat, lon, address? }
+- url?: string
+- popularity?: number (0-1 scale)
+
+Rate Limiting:
+- Token bucket algorithm per provider
+- Configurable max tokens and refill rate
+- Automatic refill based on elapsed time
+- Prevents API quota exhaustion
+- Respects provider-specific limits
+
+Testing:
+- 12 unit tests (3 per provider)
+- Fixture-based testing (no network calls)
+- Tests work without API keys (uses fixtures)
+- Tests with keys mock axios responses
+- 100% test pass rate
+
+Features:
+- Environment variable configuration
+- Graceful fallback when keys not configured
+- Comprehensive error handling
+- Logging with Pino
+- TypeScript strict typing
+- Zod validation for unified shape
+
+Files Created:
+- src/providers/types.ts - Unified types and interfaces
+- src/providers/eventbrite.ts - Eventbrite connector
+- src/providers/ticketmaster.ts - Ticketmaster connector
+- src/providers/meetup.ts - Meetup connector
+- src/providers/google-places.ts - Google Places connector
+- src/lib/rate-limiter.ts - Token bucket rate limiter
+- src/providers/__fixtures__/*.json - Test fixtures
+- src/providers/*.test.ts - Unit tests
+
+Environment Variables:
+- EVENTBRITE_TOKEN - Eventbrite OAuth token
+- TICKETMASTER_KEY - Ticketmaster API key
+- MEETUP_KEY - Meetup API key
+- GOOGLE_PLACES_KEY - Google Places API key
+
+Acceptance: ✅ pnpm test passes; with keys absent, tests use fixtures
+Test command: pnpm --filter mcp-server test
+Result: 12/12 tests passed

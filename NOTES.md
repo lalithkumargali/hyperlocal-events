@@ -242,3 +242,90 @@ All required packages are available:
 - ✅ Caching working (Redis)
 - ✅ Geo resolution working (Nominatim)
 - ✅ All tools validated with Zod
+
+## Section F - Provider Connectors
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ Implemented 4 provider connectors with unified shape
+- ✅ Eventbrite connector (OAuth/token header)
+- ✅ Ticketmaster connector
+- ✅ Meetup connector
+- ✅ Google Places connector (POIs)
+- ✅ Token bucket rate limiters per provider
+- ✅ Environment variable configuration
+- ✅ Unit tests with fixture data
+- ✅ All tests pass without API keys
+
+**Providers Implemented:**
+
+1. **Eventbrite** (`eventbrite.ts`)
+   - OAuth token authentication
+   - Rate limit: 1000 req/hour (~0.28/sec)
+   - Transforms: events, venues, categories
+   - Popularity: capacity, online, series
+
+2. **Ticketmaster** (`ticketmaster.ts`)
+   - API key authentication
+   - Rate limit: 5000 req/day (~0.06/sec)
+   - Transforms: events, classifications, venues
+   - Popularity: images, prices, promoter
+
+3. **Meetup** (`meetup.ts`)
+   - Bearer token authentication
+   - Rate limit: 200 req/hour (~0.055/sec)
+   - Transforms: meetups, groups, topics
+   - Popularity: RSVPs, waitlist, featured
+
+4. **Google Places** (`google-places.ts`)
+   - API key authentication
+   - Rate limit: Conservative (1/sec)
+   - POI types: museums, parks, galleries, etc.
+   - Popularity: ratings, reviews, open status
+
+**Unified Event Shape:**
+
+```typescript
+{
+  provider: 'eventbrite' | 'ticketmaster' | 'meetup' | 'google-places',
+  providerId: string,
+  title: string,
+  description?: string,
+  category: string[],
+  startAt?: string (ISO),
+  endAt?: string (ISO),
+  venue: {
+    name?: string,
+    lat: number,
+    lon: number,
+    address?: string
+  },
+  url?: string,
+  popularity?: number (0-1)
+}
+```
+
+**Rate Limiting:**
+
+- Token bucket algorithm
+- Per-provider limits based on API docs
+- Automatic refill over time
+- Prevents API quota exhaustion
+
+**Testing:**
+
+- 12 tests across 4 providers
+- Fixture-based (no network calls)
+- Tests without API keys use fixtures
+- Tests with API keys mock axios responses
+- 100% test pass rate
+
+**Quality Gates:**
+
+- ✅ `pnpm test` passes (12/12 tests)
+- ✅ All providers return unified shape
+- ✅ Rate limiters working
+- ✅ Tests use fixtures when keys absent
+- ✅ Environment variables read correctly
