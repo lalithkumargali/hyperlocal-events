@@ -1,0 +1,98 @@
+feat(web): MVP search UI with map and cards
+
+Implement modern Next.js frontend with MapLibre GL, shadcn/ui components, and interactive search interface.
+
+Features:
+- Modern, minimal design with shadcn/ui
+- Interactive MapLibre GL map
+- Browser geolocation support
+- Real-time search with loading states
+- Ranked suggestion cards
+- Two-panel layout (search + map)
+
+Search Form:
+- Location input (lat/lon) with manual override
+- "Use My Location" button (browser geolocation API)
+- Time available slider (15-240 minutes, 15min steps)
+- Radius slider (1-10 km, 1km steps)
+- Interests multi-select with chips
+- Add/remove interests dynamically
+- Search button with loading spinner
+
+Map Panel (MapLibre GL):
+- Interactive map with Carto Positron basemap
+- Blue marker for user's current location
+- Green markers for all suggestions
+- Red marker for selected suggestion
+- Click markers to select/highlight
+- Automatic centering on user location
+
+List Panel:
+- Scrollable list of ranked suggestion cards
+- Each card shows:
+  - Title and score percentage
+  - Distance (km) and duration (minutes)
+  - Venue name
+  - External link to details
+- Click card to select/highlight on map
+- Selected card has primary border
+- Hover effects for better UX
+
+shadcn/ui Components Added:
+- Slider (@radix-ui/react-slider)
+- Badge (for interests and scores)
+- Input (for location and interests)
+- Separator (visual dividers)
+- Card components (already existed)
+- Button components (already existed)
+
+Dependencies Added:
+- maplibre-gl@^4.0.0 - Map rendering
+- react-map-gl@^8.1.0 - React wrapper for MapLibre
+- lucide-react - Icon library
+- @radix-ui/react-slider - Slider primitive
+- @radix-ui/react-separator - Separator primitive
+
+Layout:
+- Two-panel layout (sidebar + map)
+- Left: 384px fixed width sidebar with search form and results
+- Right: Flexible map panel
+- Fully responsive design
+- Scrollable results list
+
+API Integration:
+- Calls POST /v1/suggest endpoint
+- Sends: lat, lon, minutesAvailable, interests, radiusMeters
+- Receives: Array of ranked suggestions
+- Error handling with console logging
+- Loading states during API calls
+
+User Experience:
+- Geolocation on page load
+- Manual location override available
+- Real-time interest management
+- Visual feedback for selections
+- External links open in new tab
+- Smooth transitions and hover effects
+
+Files Created:
+- apps/web/src/app/page.tsx - Main search page
+- packages/ui/src/components/slider.tsx
+- packages/ui/src/components/badge.tsx
+- packages/ui/src/components/input.tsx
+- packages/ui/src/components/separator.tsx
+
+Files Modified:
+- packages/ui/src/index.ts - Export new components
+
+Design System:
+- Consistent spacing and typography
+- Primary/secondary color scheme
+- Muted foreground for secondary text
+- Border transitions on hover/select
+- Modern, clean aesthetic
+
+Acceptance: ✅ Manual test returns fixture-based results rendered on map and list
+Test: Start API server (pnpm --filter api dev), start web (pnpm --filter web dev)
+Navigate to http://localhost:3000, click Search
+Result: Map shows markers, list shows ranked cards with fixture data

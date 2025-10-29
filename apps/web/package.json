@@ -14,10 +14,11 @@
     "@hyperlocal/core": "workspace:*",
     "@hyperlocal/ui": "workspace:*",
     "lucide-react": "^0.323.0",
-    "maplibre-gl": "^3.6.2",
+    "maplibre-gl": "^4.7.1",
     "next": "15.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-map-gl": "^8.1.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

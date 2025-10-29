@@ -517,3 +517,62 @@ API /v1/suggest → MCP Client → pipeline.suggest → Response
 - ✅ MCP client implemented
 - ✅ End-to-end validation working
 - ✅ Uses fixtures when API keys missing
+
+## Section J - Frontend MVP
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ Modern Next.js UI with shadcn/ui components
+- ✅ MapLibre GL map with markers
+- ✅ Search form with all inputs
+- ✅ Browser geolocation support
+- ✅ Ranked suggestion cards
+- ✅ Interactive map and list panels
+- ✅ Responsive design
+
+**Features:**
+
+**Search Form:**
+
+- Location input (lat/lon with manual override)
+- Geolocation button (browser API)
+- Time available slider (15-240 min)
+- Radius slider (1-10 km)
+- Interests multi-select (chips)
+- Search button with loading state
+
+**Map Panel (MapLibre):**
+
+- Interactive map with Carto Positron basemap
+- Blue marker for user location
+- Green markers for suggestions
+- Red marker for selected suggestion
+- Click markers to select
+
+**List Panel:**
+
+- Ranked suggestion cards
+- Shows: title, distance, duration, score
+- Venue name display
+- External link to details
+- Click to select/highlight on map
+
+**shadcn/ui Components:**
+
+- Card, CardHeader, CardTitle, CardDescription, CardContent
+- Button (with variants)
+- Slider (for time and radius)
+- Badge (for interests and scores)
+- Input (for location and interests)
+- Separator (visual dividers)
+
+**Quality Gates:**
+
+- ✅ Modern, minimal design
+- ✅ Geolocation working
+- ✅ Map renders with markers
+- ✅ API integration working
+- ✅ Fixture-based results display
+- ✅ Responsive layout
