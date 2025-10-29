@@ -1,5 +1,7 @@
 # Development Notes
 
+**Note:** Windsurf modifies only per section.
+
 ## Section A - Project Scaffold
 
 ### Status: ✅ COMPLETE
@@ -54,3 +56,28 @@ All required packages are available:
 - ✅ Tailwind CSS, shadcn/ui components
 - ✅ Redis, BullMQ
 - ✅ Testing tools (vitest, supertest, playwright)
+
+## Section B - Environment & Config
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ Updated `.env.example` with all required environment variables
+- ✅ Verified shared configs exist (tsconfig.base.json, eslint.config.js, .prettierrc)
+- ✅ Added note about Windsurf modifying only per section
+
+**Environment Variables:**
+
+- Core: NODE_ENV, LOG_LEVEL
+- API: API_PORT, API_BASE_URL
+- Web: WEB_PORT, MAP_TILE_URL
+- DB: DATABASE_URL
+- Redis: REDIS_URL
+- MCP: MCP_PORT, MCP_ALLOWED_ORIGINS
+- Providers: EVENTBRITE_TOKEN, TICKETMASTER_KEY, MEETUP_KEY, GOOGLE_PLACES_KEY, OPENROUTESERVICE_KEY
+
+**Quality Gates:**
+
+- ✅ `pnpm lint` - PASSED
+- ✅ `pnpm type-check` - PASSED

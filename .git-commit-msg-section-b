@@ -1,0 +1,22 @@
+chore(config): add envs and shared configs
+
+Update environment configuration and verify shared configs for the monorepo.
+
+Changes:
+- Updated .env.example with comprehensive environment variables
+  - Core: NODE_ENV, LOG_LEVEL
+  - API: API_PORT (4000), API_BASE_URL
+  - Web: WEB_PORT (3000), MAP_TILE_URL
+  - DB: DATABASE_URL (PostgreSQL)
+  - Redis: REDIS_URL
+  - MCP: MCP_PORT (7070), MCP_ALLOWED_ORIGINS
+  - Providers: EVENTBRITE_TOKEN, TICKETMASTER_KEY, MEETUP_KEY, GOOGLE_PLACES_KEY, OPENROUTESERVICE_KEY
+
+- Verified shared configs exist:
+  - packages/config/tsconfig.base.json (TypeScript base config)
+  - packages/config/eslint.config.js (ESLint shared rules)
+  - .prettierrc (Prettier formatting rules)
+
+- Added note to NOTES.md: "Windsurf modifies only per section"
+
+Quality gates: ✅ lint, ✅ type-check
