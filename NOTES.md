@@ -177,3 +177,68 @@ All required packages are available:
 - ✅ OpenAPI spec generated
 - ✅ Mock suggestions deterministic
 - ✅ Ready for MCP integration (Section E)
+
+## Section E - MCP Server
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ Implemented 6 MCP tools with Zod validation
+- ✅ geo.resolve - Reverse geocode with Nominatim + bounding box
+- ✅ events.search - Fan-out to 4 providers (mock implementations)
+- ✅ rank.score - Transparent scoring with weighted factors
+- ✅ cache.get/set - Redis caching with TTL (10-30 min)
+- ✅ pipeline.suggest - Full orchestration pipeline
+- ✅ CLI test script working with mock data
+
+**Tools Implemented:**
+
+1. **geo.resolve** - Reverse geocode lat/lon
+   - Uses Nominatim (OpenStreetMap) API
+   - Computes bounding box based on radius
+   - Returns address, city, state, country
+
+2. **events.search** - Fan-out to providers
+   - Eventbrite (mock)
+   - Ticketmaster (mock)
+   - Meetup (mock)
+   - Google Places for POIs (mock)
+   - Fail-fast on errors, continue with others
+   - Jitter (50-200ms) to respect rate limits
+
+3. **rank.score** - Transparent scoring function
+   - Relevance: 30% (interest match)
+   - Proximity: 25% (distance-based)
+   - Time-fit: 25% (fits in available time)
+   - Popularity: 20% (provider score)
+   - Returns sorted by score (0-1)
+
+4. **cache.get/set** - Redis caching
+   - TTL: 10-30 minutes (random to avoid thundering herd)
+   - JSON serialization
+   - Graceful fallback on errors
+
+5. **pipeline.suggest** - Orchestrator
+   - Step 1: geo.resolve
+   - Step 2: events.search (all providers)
+   - Step 3: rank.score
+   - Step 4: Return top N (default 20)
+   - Includes metadata (providers, cached, timing)
+
+**Features:**
+
+- All tools strictly typed with Zod schemas
+- Side-effect logging with Pino
+- Fail-fast on provider errors
+- Rate limit respect with jitter
+- Redis caching for performance
+- Transparent scoring algorithm
+
+**Quality Gates:**
+
+- ✅ CLI test returns 4 mock suggestions
+- ✅ Scoring algorithm working (relevance, proximity, time-fit, popularity)
+- ✅ Caching working (Redis)
+- ✅ Geo resolution working (Nominatim)
+- ✅ All tools validated with Zod

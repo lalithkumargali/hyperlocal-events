@@ -1,0 +1,68 @@
+feat(mcp): base server with tools geo/events/rank/cache/pipeline
+
+Implement MCP server with 6 tools for event discovery and ranking.
+
+Tools:
+1. geo.resolve - Reverse geocode lat/lon using Nominatim
+   - Computes bounding box based on radius
+   - Returns address, city, state, country
+   - Fallback to bounding box only on API failure
+
+2. events.search - Fan-out to multiple providers
+   - Eventbrite (mock implementation)
+   - Ticketmaster (mock implementation)
+   - Meetup (mock implementation)
+   - Google Places for POIs (mock implementation)
+   - Fail-fast on individual provider errors
+   - Continue with other providers
+   - Jitter (50-200ms) to respect rate limits
+
+3. rank.score - Transparent scoring algorithm
+   - Relevance: 30% (interest match with categories)
+   - Proximity: 25% (Haversine distance calculation)
+   - Time-fit: 25% (fits within available time)
+   - Popularity: 20% (provider popularity score)
+   - Returns events sorted by score (0-1)
+   - Includes score breakdown for transparency
+
+4. cache.get/set - Redis caching
+   - TTL: 10-30 minutes (random to avoid thundering herd)
+   - JSON serialization/deserialization
+   - Graceful fallback on Redis errors
+   - Cache key based on lat/lon/radius
+
+5. pipeline.suggest - Full orchestration
+   - Step 1: geo.resolve (location context)
+   - Step 2: events.search (fan-out to all providers)
+   - Step 3: rank.score (score and sort)
+   - Step 4: Return top N (default 20)
+   - Includes metadata (providers, cached status, timing)
+
+Features:
+- All tools strictly typed with Zod schemas
+- Side-effect logging with Pino
+- Fail-fast on provider errors, continue with others
+- Rate limit respect with random jitter
+- Redis caching for performance
+- Transparent scoring with breakdown
+- Mock provider implementations (ready for real APIs)
+
+Scoring Algorithm:
+- Distance: Haversine formula for accuracy
+- Relevance: Category matching with user interests
+- Time-fit: Considers event timing and duration
+- Popularity: Provider-specific popularity scores
+- Weighted sum with configurable weights
+
+Dependencies:
+- axios: HTTP requests to external APIs
+- ioredis: Redis client for caching
+- zod: Schema validation
+
+Test:
+- CLI test script: pnpm --filter mcp-server test:cli
+- Returns 4 mock suggestions with scores
+- Processing time: ~1000ms (includes Nominatim API call)
+
+Acceptance: ✅ Local CLI call to pipeline.suggest returns mock data
+Test command: pnpm --filter mcp-server test:cli
