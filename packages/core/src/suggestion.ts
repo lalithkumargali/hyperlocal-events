@@ -1,18 +1,9 @@
 import { z } from 'zod';
 
-// Request schema
-export const SuggestRequestSchema = z.object({
-  lat: z.number().min(-90).max(90),
-  lon: z.number().min(-180).max(180),
-  minutesAvailable: z.number().int().min(15).max(360),
-  interests: z.array(z.string()).optional(),
-  radiusMeters: z.number().int().positive().default(5000),
-  now: z.string().datetime().optional(),
-});
+/**
+ * Shared schemas for suggestion API and MCP pipeline
+ */
 
-export type SuggestRequest = z.infer<typeof SuggestRequestSchema>;
-
-// Response schemas
 export const VenueSchema = z.object({
   name: z.string(),
   address: z.string().optional(),
@@ -35,8 +26,18 @@ export const SuggestionSchema = z.object({
   url: z.string().url().optional(),
 });
 
+export const SuggestRequestSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lon: z.number().min(-180).max(180),
+  minutesAvailable: z.number().int().min(15).max(360),
+  interests: z.array(z.string()).optional(),
+  radiusMeters: z.number().int().positive().default(5000),
+  now: z.string().datetime().optional(),
+});
+
 export const SuggestResponseSchema = z.array(SuggestionSchema);
 
 export type Venue = z.infer<typeof VenueSchema>;
 export type Suggestion = z.infer<typeof SuggestionSchema>;
+export type SuggestRequest = z.infer<typeof SuggestRequestSchema>;
 export type SuggestResponse = z.infer<typeof SuggestResponseSchema>;

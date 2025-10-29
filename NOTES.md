@@ -459,3 +459,61 @@ All required packages are available:
 - ✅ Deterministic with fixtures
 - ✅ Jaccard similarity working correctly
 - ✅ Sigmoid drop-off smooth
+
+## Section I - API↔️MCP Wiring
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ Moved shared schemas to packages/core
+- ✅ Created MCP client in API
+- ✅ Wired /v1/suggest to MCP pipeline.suggest
+- ✅ Removed mock data from controller
+- ✅ Added Zod validation for MCP responses
+- ✅ End-to-end flow working with fixtures
+
+**Architecture:**
+
+```
+API /v1/suggest → MCP Client → pipeline.suggest → Response
+     ↓                              ↓
+  Validate Input              geo.resolve
+     ↓                              ↓
+  Call MCP                    events.search (mock providers)
+     ↓                              ↓
+  Validate Output             rank.score
+     ↓                              ↓
+  Return JSON                 Return top N
+```
+
+**Shared Schemas (packages/core):**
+
+- `SuggestRequestSchema` - Request validation
+- `SuggestResponseSchema` - Response validation
+- `SuggestionSchema` - Individual suggestion
+- `VenueSchema` - Venue information
+
+**MCP Client:**
+
+- Direct import for monorepo (development)
+- Ready for HTTP/IPC in production
+- Error handling with 502 on MCP failure
+- Comprehensive logging
+
+**Flow:**
+
+1. API receives POST /v1/suggest
+2. Validates request with Zod
+3. Calls MCP pipeline.suggest via client
+4. MCP orchestrates: geo → events → rank
+5. Validates MCP response with Zod
+6. Returns suggestions to client
+
+**Quality Gates:**
+
+- ✅ Shared schemas in packages/core
+- ✅ Mock data removed from controller
+- ✅ MCP client implemented
+- ✅ End-to-end validation working
+- ✅ Uses fixtures when API keys missing

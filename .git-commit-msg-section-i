@@ -1,0 +1,87 @@
+feat(api): wire /v1/suggest to MCP pipeline
+
+Wire API /v1/suggest endpoint to MCP pipeline.suggest, add shared schemas in packages/core, and enable end-to-end flow with validation.
+
+Architecture:
+API /v1/suggest → MCP Client → pipeline.suggest
+     ↓                              ↓
+  Validate Input              geo.resolve
+     ↓                              ↓
+  Call MCP                    events.search
+     ↓                              ↓
+  Validate Output             rank.score
+     ↓                              ↓
+  Return JSON                 Return top N
+
+Shared Schemas (packages/core):
+- SuggestRequestSchema - Request validation
+  - lat, lon, minutesAvailable (required)
+  - interests, radiusMeters, now (optional)
+- SuggestResponseSchema - Response validation
+  - Array of suggestions
+- SuggestionSchema - Individual suggestion
+  - id, title, type, score, provider, etc.
+- VenueSchema - Venue information
+  - name, lat, lon, address
+
+MCP Client (apps/api/src/lib/mcp-client.ts):
+- Abstraction layer for calling MCP tools
+- Direct import for monorepo (development)
+- Ready for HTTP/IPC in production
+- Generic callMCPTool function
+- Error handling with structured responses
+- Comprehensive logging
+
+Controller Changes (apps/api/src/controllers/suggest.ts):
+- Removed all mock data
+- Calls MCP pipeline.suggest via client
+- Validates request with shared schema
+- Validates response with shared schema
+- Returns 502 on MCP failure
+- Returns 400 on validation errors
+
+Flow:
+1. API receives POST /v1/suggest
+2. Validates request with SuggestRequestSchema
+3. Calls MCP pipeline.suggest via callMCPTool
+4. MCP orchestrates:
+   - geo.resolve (Nominatim + bounding box)
+   - events.search (fan-out to providers)
+   - rank.score (multi-factor scoring)
+5. Validates MCP response with SuggestResponseSchema
+6. Returns validated suggestions to client
+
+Error Handling:
+- 400: Validation errors (Zod)
+- 502: MCP server unavailable or failed
+- Comprehensive logging at each step
+
+Features:
+- End-to-end type safety with Zod
+- Shared schemas across API and MCP
+- Graceful error handling
+- Works with fixtures when API keys missing
+- Ready for production HTTP/IPC
+
+Files Created:
+- packages/core/src/suggestion.ts - Shared schemas
+- apps/api/src/lib/mcp-client.ts - MCP client
+- test-suggest-e2e.sh - End-to-end test script
+
+Files Modified:
+- packages/core/src/index.ts - Export suggestion schemas
+- apps/api/src/controllers/suggest.ts - Wire to MCP
+
+Files Removed:
+- apps/api/src/schemas/suggest.ts - Moved to core
+
+Benefits:
+- Single source of truth for schemas
+- Type-safe end-to-end
+- Easy to swap MCP transport (HTTP/IPC)
+- Validation at API and MCP boundaries
+- Works with mock providers (no API keys needed)
+
+Acceptance: ✅ Real suggestions flow end-to-end with fixtures when keys are missing
+Test: Start API server, run ./test-suggest-e2e.sh
+Result: Returns ranked suggestions from MCP pipeline
