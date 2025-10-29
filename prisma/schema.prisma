@@ -39,6 +39,8 @@ model Place {
   events     Event[]
 
   @@unique([provider, providerId])
+  @@index([category], type: Gin)
+  @@index([location], type: Gist)
   @@map("places")
 }
 
@@ -62,6 +64,7 @@ model Event {
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   @@unique([provider, providerId])
+  @@index([category], type: Gin)
   @@index([startAt])
   @@index([venueId])
   @@index([popularityScore])

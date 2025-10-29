@@ -1,0 +1,89 @@
+feat(data): background ingest, DB upsert, caching
+
+Implement BullMQ workers for background ingestion, database upserts with deduplication, and multi-tier caching strategy.
+
+Background Workers (BullMQ):
+- Ingestion worker processes region ingestion jobs
+- Concurrency: 2 jobs at a time
+- Rate limiting: Max 10 jobs per minute
+- Retry logic: 3 attempts with exponential backoff
+- Job persistence: Keeps last 100 completed, 50 failed jobs
+- Graceful shutdown handling (SIGTERM/SIGINT)
+
+Database Ingestion:
+- Upsert logic with ON CONFLICT (provider, provider_id)
+- Deduplication prevents duplicate events and places
+- PostGIS for venue location storage (geography Point)
+- Atomic transactions for data consistency
+- Comprehensive error handling and logging
+
+Database Indexes:
+- GIN index on Event.category (fast array searches)
+- GIN index on Place.category (fast array searches)
+- GIST index on Place.location (spatial queries with PostGIS)
+- Improves query performance for category and location filters
+
+Caching Strategy (3-tier):
+1. Redis Cache (TTL: 30 minutes)
+   - Fast in-memory lookup
+   - Key format: events:{lat}:{lon}:{radius}
+   - Automatic expiration
+
+2. Database Cache (Fresh < 2 hours)
+   - PostGIS distance queries (ST_DWithin)
+   - Filters by updated_at timestamp
+   - Returns up to 100 events sorted by popularity
+   - Includes distance calculation
+
+3. Provider Fan-out (Cache miss)
+   - Triggers async ingestion job via BullMQ
+   - Non-blocking (returns empty array)
+   - Client can retry after job completes
+   - Automatic cache population
+
+Hot Regions:
+- Recurring jobs for popular cities
+- San Francisco: Every 2 hours (cron: 0 */2 * * *)
+- New York: Every 2 hours (cron: 0 */2 * * *)
+- Configurable via cron patterns
+- Prevents cold starts for popular regions
+
+Files Created:
+- apps/api/src/jobs/types.ts - Job type definitions
+- apps/api/src/jobs/ingest-worker.ts - BullMQ worker
+- apps/api/src/jobs/queue.ts - Queue management
+- apps/api/src/services/ingestion.ts - DB upsert logic
+- apps/api/src/services/cache.ts - Caching strategy
+- apps/api/src/worker.ts - Worker startup script
+- apps/api/scripts/test-ingest.ts - Manual ingestion test
+
+Database Changes:
+- Added GIN indexes on category arrays
+- Added GIST index on location (PostGIS)
+- Migration: 20251029192833_add_indexes
+
+Scripts:
+- pnpm --filter api worker - Start background worker
+- pnpm --filter api worker:dev - Start with watch mode
+- pnpm --filter api test:ingest - Test ingestion manually
+
+Features:
+- Automatic deduplication by (provider, providerId)
+- PostGIS spatial queries for nearby events
+- Multi-tier caching for performance
+- Background job processing with BullMQ
+- Recurring jobs for hot regions
+- Comprehensive logging with Pino
+- Graceful shutdown handling
+
+Test Results:
+- Worker successfully populates DB
+- 8 events ingested (6 from seed + 2 from test)
+- 6 places ingested (4 from seed + 2 from test)
+- Deduplication working (no duplicates)
+- GIN/GIST indexes created successfully
+- Caching strategy implemented and tested
+
+Acceptance: ✅ Running the worker populates DB for a test city
+Test command: pnpm --filter api test:ingest
+Result: 8 events, 6 places in database

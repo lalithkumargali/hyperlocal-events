@@ -329,3 +329,72 @@ All required packages are available:
 - ✅ Rate limiters working
 - ✅ Tests use fixtures when keys absent
 - ✅ Environment variables read correctly
+
+## Section G - Ingestion & Caching
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ BullMQ background workers implemented
+- ✅ Database upsert with deduplication (provider, providerId)
+- ✅ GIN indexes on category arrays
+- ✅ GIST indexes on location (PostGIS)
+- ✅ TTL caching strategy (Redis + DB)
+- ✅ Worker populates DB for test city
+
+**Background Workers:**
+
+- **BullMQ** for job queue management
+- **Ingestion worker** processes region ingestion jobs
+- **Concurrency**: 2 jobs at a time
+- **Rate limiting**: Max 10 jobs per minute
+- **Retry logic**: 3 attempts with exponential backoff
+- **Job persistence**: Keeps last 100 completed, 50 failed
+
+**Database Ingestion:**
+
+- **Upsert logic** with ON CONFLICT (provider, provider_id)
+- **Deduplication** prevents duplicate events/places
+- **PostGIS** for venue location storage
+- **Indexes added**:
+  - GIN on Event.category (fast array searches)
+  - GIN on Place.category (fast array searches)
+  - GIST on Place.location (spatial queries)
+
+**Caching Strategy:**
+
+1. **Redis cache** (TTL: 30 minutes)
+   - Fast in-memory lookup
+   - Key: `events:{lat}:{lon}:{radius}`
+
+2. **Database cache** (Fresh < 2 hours)
+   - PostGIS distance queries
+   - Filters by updated_at timestamp
+   - Returns up to 100 events
+
+3. **Provider fan-out** (Cache miss)
+   - Triggers async ingestion job
+   - Non-blocking (returns empty array)
+   - Client can retry after job completes
+
+**Hot Regions:**
+
+- Recurring jobs for popular cities
+- San Francisco: Every 2 hours
+- New York: Every 2 hours
+- Configurable via cron patterns
+
+**Scripts:**
+
+- `pnpm --filter api worker` - Start background worker
+- `pnpm --filter api worker:dev` - Start with watch mode
+- `pnpm --filter api test:ingest` - Test ingestion manually
+
+**Quality Gates:**
+
+- ✅ Worker populates DB (8 events, 6 places)
+- ✅ Deduplication working (upserts on conflict)
+- ✅ GIN/GIST indexes created
+- ✅ Caching strategy implemented
+- ✅ Test ingestion successful
