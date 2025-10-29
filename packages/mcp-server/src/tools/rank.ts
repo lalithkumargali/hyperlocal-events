@@ -8,11 +8,10 @@ import { RankScoreInput, RankScoreInputSchema, RankScoreOutput, ScoredEvent } fr
  */
 export async function rankScore(input: unknown): Promise<RankScoreOutput> {
   const validated = RankScoreInputSchema.parse(input);
-  const { events, userLat, userLon, interests = [], minutesAvailable, now } = validated;
+  const { events, userLat, userLon, interests = [], minutesAvailable } = validated;
 
   logger.info({ eventCount: events.length, interests, minutesAvailable }, 'rank.score called');
 
-  const currentTime = now ? new Date(now) : new Date();
   const scoredEvents: ScoredEvent[] = [];
 
   for (const event of events) {
@@ -34,27 +33,23 @@ export async function rankScore(input: unknown): Promise<RankScoreOutput> {
             : 60; // Default place visit duration
 
       // Calculate individual scores (0-1 scale)
-      const relevanceScore = calculateRelevance(event.category, interests);
-      const proximityScore = calculateProximity(distanceMeters);
-      const timeFitScore = calculateTimeFit(
-        durationMinutes,
-        minutesAvailable,
-        event.startAt,
-        currentTime
-      );
+      const interestScore = calculateInterestScore(event.category, interests);
+      const distanceScore = calculateDistanceScore(distanceMeters, 10000); // Assume 10km radius
+      const timeFitScore = calculateTimeFitScore(durationMinutes, minutesAvailable);
       const popularityScore = event.popularityScore || 0.5;
 
-      // Weighted sum (configurable weights)
+      // Weighted sum with specified weights
+      // score = 0.4*interest + 0.3*distance + 0.2*timeFit + 0.1*popularity
       const weights = {
-        relevance: 0.3,
-        proximity: 0.25,
-        timeFit: 0.25,
-        popularity: 0.2,
+        interest: 0.4,
+        distance: 0.3,
+        timeFit: 0.2,
+        popularity: 0.1,
       };
 
       const totalScore =
-        relevanceScore * weights.relevance +
-        proximityScore * weights.proximity +
+        interestScore * weights.interest +
+        distanceScore * weights.distance +
         timeFitScore * weights.timeFit +
         popularityScore * weights.popularity;
 
@@ -62,8 +57,8 @@ export async function rankScore(input: unknown): Promise<RankScoreOutput> {
         ...event,
         score: Math.min(1, Math.max(0, totalScore)),
         scoreBreakdown: {
-          relevance: relevanceScore,
-          proximity: proximityScore,
+          relevance: interestScore,
+          proximity: distanceScore,
           timeFit: timeFitScore,
           popularity: popularityScore,
         },
@@ -107,62 +102,49 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 /**
- * Calculate relevance score based on interest match
+ * Calculate interest score using Jaccard similarity
+ * Jaccard = |intersection| / |union|
  */
-function calculateRelevance(categories: string[], interests: string[]): number {
+function calculateInterestScore(categories: string[], interests: string[]): number {
   if (interests.length === 0) return 0.5; // Neutral if no interests specified
 
-  const matches = categories.filter((cat) =>
-    interests.some((interest) => cat.toLowerCase().includes(interest.toLowerCase()))
-  );
+  // Normalize to lowercase for comparison
+  const catSet = new Set(categories.map((c) => c.toLowerCase()));
+  const intSet = new Set(interests.map((i) => i.toLowerCase()));
 
-  return Math.min(1, matches.length / Math.max(interests.length, 1));
+  // Calculate intersection
+  const intersection = new Set([...catSet].filter((x) => intSet.has(x)));
+
+  // Calculate union
+  const union = new Set([...catSet, ...intSet]);
+
+  // Jaccard similarity
+  return union.size > 0 ? intersection.size / union.size : 0;
 }
 
 /**
- * Calculate proximity score (closer = better)
+ * Calculate distance score
+ * distanceScore = max(0, 1 - (distanceMeters / radiusMeters))
  */
-function calculateProximity(distanceMeters: number): number {
-  // Score decreases with distance
-  // 0m = 1.0, 5000m = 0.5, 10000m = 0.1
-  const maxDistance = 10000; // 10km
-  const score = Math.max(0, 1 - distanceMeters / maxDistance);
-  return Math.pow(score, 0.5); // Square root for gentler falloff
+function calculateDistanceScore(distanceMeters: number, radiusMeters: number): number {
+  return Math.max(0, 1 - distanceMeters / radiusMeters);
 }
 
 /**
- * Calculate time-fit score (can complete within available time)
+ * Calculate time-fit score with sigmoid drop-off
+ * timeFitScore = 1 if duration <= minutesAvailable, else sigmoid drop
  */
-function calculateTimeFit(
-  durationMinutes: number,
-  minutesAvailable: number,
-  startAt: string | undefined,
-  currentTime: Date
-): number {
-  // Check if duration fits
-  if (durationMinutes > minutesAvailable) {
-    return 0.1; // Very low score if doesn't fit
+function calculateTimeFitScore(durationMinutes: number, minutesAvailable: number): number {
+  if (durationMinutes <= minutesAvailable) {
+    return 1.0;
   }
 
-  // Check if event is happening soon (if it has a start time)
-  if (startAt) {
-    const eventStart = new Date(startAt);
-    const hoursUntilStart = (eventStart.getTime() - currentTime.getTime()) / (1000 * 60 * 60);
+  // Sigmoid drop-off for durations exceeding available time
+  // sigmoid(x) = 1 / (1 + e^x)
+  // Map excess time to sigmoid input
+  const excessMinutes = durationMinutes - minutesAvailable;
+  const normalizedExcess = excessMinutes / minutesAvailable; // 0 to infinity
+  const sigmoidInput = normalizedExcess * 4; // Scale for steeper drop
 
-    // Events starting within available time window are better
-    if (hoursUntilStart < 0) {
-      return 0.2; // Event already started
-    } else if (hoursUntilStart < minutesAvailable / 60) {
-      return 1.0; // Perfect timing
-    } else if (hoursUntilStart < 24) {
-      return 0.7; // Today
-    } else if (hoursUntilStart < 168) {
-      return 0.5; // This week
-    } else {
-      return 0.3; // Future
-    }
-  }
-
-  // For places without start time, just check duration fit
-  return durationMinutes <= minutesAvailable * 0.5 ? 1.0 : 0.8;
+  return 1 / (1 + Math.exp(sigmoidInput));
 }

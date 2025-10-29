@@ -398,3 +398,64 @@ All required packages are available:
 - ✅ GIN/GIST indexes created
 - ✅ Caching strategy implemented
 - ✅ Test ingestion successful
+
+## Section H - Ranking & Time-Fit
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ Implemented multi-factor scoring algorithm
+- ✅ Jaccard similarity for interest matching
+- ✅ Distance-based scoring
+- ✅ Time-fit with sigmoid drop-off
+- ✅ Weighted scoring formula
+- ✅ 9 comprehensive unit tests
+- ✅ All tests pass, scores sorted descending
+
+**Scoring Algorithm:**
+
+**Formula:** `score = 0.4*interest + 0.3*distance + 0.2*timeFit + 0.1*popularity`
+
+1. **Interest Score** (40% weight)
+   - Jaccard similarity: `|intersection| / |union|`
+   - Compares user interests with event categories
+   - Case-insensitive matching
+   - Returns 0.5 (neutral) if no interests specified
+
+2. **Distance Score** (30% weight)
+   - Formula: `max(0, 1 - (distanceMeters / radiusMeters))`
+   - Linear decay with distance
+   - 0m = 1.0, radiusMeters = 0.0
+   - Simple and predictable
+
+3. **Time-Fit Score** (20% weight)
+   - Returns 1.0 if duration ≤ minutesAvailable
+   - Sigmoid drop-off if duration > minutesAvailable
+   - Formula: `1 / (1 + e^(normalizedExcess * 4))`
+   - Smooth degradation for longer events
+
+4. **Popularity Score** (10% weight)
+   - Normalized provider popularity (0-1)
+   - From provider data
+   - Lowest weight to avoid bias
+
+**Test Coverage:**
+
+- ✅ Perfect interest match (Jaccard = 1.0)
+- ✅ Partial interest match (Jaccard = 0.25)
+- ✅ Distance scoring accuracy
+- ✅ Sigmoid drop for time-fit
+- ✅ Time-fit = 1.0 when duration fits
+- ✅ Correct weight application
+- ✅ Descending sort by score
+- ✅ Handles missing venues
+- ✅ Handles empty interests
+
+**Quality Gates:**
+
+- ✅ All 21 tests pass (9 rank + 12 provider)
+- ✅ Scores sorted descending
+- ✅ Deterministic with fixtures
+- ✅ Jaccard similarity working correctly
+- ✅ Sigmoid drop-off smooth

@@ -1,0 +1,83 @@
+feat(rank): multi-factor scoring + tests
+
+Implement transparent multi-factor ranking algorithm with Jaccard similarity, distance scoring, time-fit with sigmoid, and comprehensive unit tests.
+
+Scoring Algorithm:
+score = 0.4*interest + 0.3*distance + 0.2*timeFit + 0.1*popularity
+
+1. Interest Score (40% weight):
+   - Jaccard similarity: |intersection| / |union|
+   - Compares user interests with event categories
+   - Case-insensitive matching
+   - Returns 0.5 (neutral) if no interests specified
+   - Example: interests=[music, rock], categories=[music, jazz, live]
+     → intersection={music}, union={music, rock, jazz, live}
+     → Jaccard = 1/4 = 0.25
+
+2. Distance Score (30% weight):
+   - Formula: max(0, 1 - (distanceMeters / radiusMeters))
+   - Linear decay with distance
+   - 0m = 1.0 (perfect), radiusMeters = 0.0 (edge)
+   - Simple and predictable scoring
+
+3. Time-Fit Score (20% weight):
+   - Returns 1.0 if duration ≤ minutesAvailable
+   - Sigmoid drop-off if duration > minutesAvailable
+   - Formula: 1 / (1 + e^(normalizedExcess * 4))
+   - Smooth degradation for longer events
+   - Example: 180min event, 120min available
+     → excess=60, normalized=0.5, sigmoid≈0.12
+
+4. Popularity Score (10% weight):
+   - Normalized provider popularity (0-1)
+   - From provider-specific metrics
+   - Lowest weight to avoid over-weighting popularity
+
+Features:
+- Transparent scoring with breakdown
+- Deterministic results with same inputs
+- Handles edge cases (missing venues, empty interests)
+- Sorts results by score descending
+- All scores normalized to 0-1 range
+
+Unit Tests (9 tests):
+1. Perfect interest match (Jaccard = 1.0)
+2. Partial interest match (Jaccard = 0.25)
+3. Distance score accuracy (~0.889 for 1.1km)
+4. Sigmoid drop for time-fit (duration > available)
+5. Time-fit = 1.0 when duration fits
+6. Correct weight application (0.4+0.3+0.2+0.1)
+7. Descending sort by score
+8. Handles events without venues
+9. Handles empty interests (neutral 0.5)
+
+Test Results:
+- 21/21 tests passed
+- 9 rank.score tests
+- 12 provider tests (from Section F)
+- All deterministic with fixtures
+- Scores properly sorted descending
+
+Changes:
+- Updated rank.score implementation
+- Replaced simple relevance with Jaccard similarity
+- Replaced proximity with distance formula
+- Replaced complex time-fit with sigmoid
+- Updated weights to specified values
+- Added comprehensive unit tests
+
+Files Modified:
+- packages/mcp-server/src/tools/rank.ts
+
+Files Created:
+- packages/mcp-server/src/tools/rank.test.ts
+
+Mathematical Properties:
+- Jaccard similarity: symmetric, bounded [0,1]
+- Distance score: linear, bounded [0,1]
+- Sigmoid: smooth, monotonic, bounded (0,1)
+- Final score: weighted sum, bounded [0,1]
+
+Acceptance: ✅ Tests green; scores sorted desc
+Test command: pnpm --filter mcp-server test
+Result: 21/21 tests passed
