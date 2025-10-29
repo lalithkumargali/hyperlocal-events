@@ -1,0 +1,37 @@
+FROM node:20-alpine AS base
+
+# Install pnpm
+RUN npm install -g pnpm@8.15.0
+
+FROM base AS dependencies
+
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/*/package.json ./packages/*/
+
+RUN pnpm install --frozen-lockfile
+
+FROM base AS build
+
+WORKDIR /app
+COPY . .
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=dependencies /app/packages/*/node_modules ./packages/*/node_modules
+
+RUN pnpm run build --filter=@hyperlocal/api
+
+FROM base AS runtime
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=build /app/apps/api/dist ./apps/api/dist
+COPY --from=build /app/apps/api/package.json ./apps/api/
+COPY --from=dependencies /app/node_modules ./node_modules
+
+EXPOSE 3001
+
+CMD ["node", "apps/api/dist/index.js"]
