@@ -11,10 +11,14 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate": "prisma migrate dev",
+    "prisma:generate": "prisma generate --schema=../../prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate dev --schema=../../prisma/schema.prisma",
+    "prisma:seed": "tsx scripts/seed.ts",
+    "prisma:studio": "prisma studio --schema=../../prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=../../prisma/schema.prisma",
     "db:seed": "tsx scripts/seed.ts",
-    "db:studio": "prisma studio",
-    "db:generate": "prisma generate"
+    "db:studio": "prisma studio --schema=../../prisma/schema.prisma",
+    "db:generate": "prisma generate --schema=../../prisma/schema.prisma"
   },
   "dependencies": {
     "@hyperlocal/core": "workspace:*",

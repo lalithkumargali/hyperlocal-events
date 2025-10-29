@@ -35,7 +35,9 @@ lerna-debug.log*
 .turbo
 
 # Prisma
-prisma/migrations/
+# Keep init migration for PostGIS
+prisma/migrations/*
+!prisma/migrations/00000000000000_init/
 
 # IDE
 .vscode/

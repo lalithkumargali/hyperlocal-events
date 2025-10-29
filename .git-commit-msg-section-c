@@ -1,0 +1,35 @@
+feat(db): prisma models, migrations, seed
+
+Add complete database schema with Prisma, PostGIS support, migrations, and seed data.
+
+Database Models:
+- User: id, email (unique), interests (string array)
+- Place: id, provider, providerId, name, category[], location (PostGIS Point), address, city, state, country, url
+- Event: id, provider, providerId, title, description, category[], startAt, endAt, venueId (FK to Place), priceMin, priceMax, currency, url, popularityScore
+- IngestLog: id, provider, startedAt, finishedAt, ok, records, error
+
+Features:
+- PostGIS extension enabled for geospatial queries
+- Geography Point type for place locations
+- Unique constraints on provider + providerId
+- Indexes on startAt, venueId, popularityScore, provider + startedAt
+- Foreign key relationship: Event.venueId → Place.id
+
+Migrations:
+- 00000000000000_init: Enable PostGIS extension
+- Auto-generated migration for all models
+
+Seed Data:
+- 2 Users with interests
+- 4 Places in San Francisco with PostGIS coordinates
+- 6 Events across various categories (music, tech, theater, sports, art, food)
+- 2 Ingest Logs (1 success, 1 failure)
+
+Scripts:
+- pnpm prisma:generate - Generate Prisma Client
+- pnpm prisma:migrate - Run migrations
+- pnpm prisma:seed - Seed database
+- pnpm prisma:studio - Open Prisma Studio
+
+Acceptance: ✅ pnpm prisma:migrate && pnpm prisma:seed succeed
+Database verified: All tables exist with seeded data

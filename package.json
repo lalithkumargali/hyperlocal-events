@@ -17,6 +17,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "clean": "turbo run clean && rm -rf node_modules",
+    "prisma:generate": "pnpm --filter api prisma:generate",
+    "prisma:migrate": "pnpm --filter api prisma:migrate",
+    "prisma:seed": "pnpm --filter api prisma:seed",
+    "prisma:studio": "pnpm --filter api prisma:studio",
     "db:migrate": "pnpm --filter api db:migrate",
     "db:seed": "pnpm --filter api db:seed",
     "docker:up": "docker-compose -f infra/docker/docker-compose.yml up -d",
@@ -24,11 +28,15 @@
   },
   "devDependencies": {
     "prettier": "^3.2.5",
+    "prisma": "5.22.0",
     "turbo": "^1.12.5",
     "typescript": "^5.3.3"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@prisma/client": "5.22.0"
+  }
 }
