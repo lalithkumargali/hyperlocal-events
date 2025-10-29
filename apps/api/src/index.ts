@@ -5,7 +5,7 @@ import { logger } from './lib/logger';
 
 dotenv.config();
 
-const PORT = process.env.API_PORT || 3001;
+const PORT = process.env.API_PORT || 4000;
 const HOST = process.env.API_HOST || 'localhost';
 
 app.listen(Number(PORT), HOST, () => {

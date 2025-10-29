@@ -1,5 +1,5 @@
 import cors from 'cors';
-import express from 'express';
+import express, { Express } from 'express';
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 
@@ -9,7 +9,7 @@ import { eventsRouter } from './routes/events';
 import { healthRouter } from './routes/health';
 import { openApiRouter } from './routes/openapi';
 
-export const app = express();
+export const app: Express = express();
 
 // Middleware
 app.use(helmet());

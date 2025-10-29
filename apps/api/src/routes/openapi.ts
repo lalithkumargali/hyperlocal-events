@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router, type IRouter } from 'express';
 
-export const openApiRouter = Router();
+export const openApiRouter: IRouter = Router();
 
 // OpenAPI documentation - will be implemented with zod-to-openapi in later sections
 openApiRouter.get('/', (_req, res) => {

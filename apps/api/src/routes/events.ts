@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router, type IRouter } from 'express';
 
-export const eventsRouter = Router();
+export const eventsRouter: IRouter = Router();
 
 // Placeholder routes - will be implemented in later sections
 eventsRouter.get('/', (_req, res) => {

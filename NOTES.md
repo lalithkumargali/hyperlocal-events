@@ -2,20 +2,36 @@
 
 ## Section A - Project Scaffold
 
-### Status: ✅ Complete
+### Status: ✅ COMPLETE
+
+**Quality Gates:**
+- ✅ `pnpm lint` - PASSED (warnings only, no errors)
+- ✅ `pnpm type-check` - PASSED
+- ⚠️ `pnpm test` - No test files yet (expected for scaffold)
+- ✅ `pnpm build` - All packages build successfully
+- ✅ Dependencies installed successfully
 
 All scaffold files created. Next steps:
 
-1. Install dependencies: `pnpm install`
-2. Start Docker services: `pnpm docker:up`
-3. Run Prisma migrations: `pnpm db:migrate`
-4. Generate Prisma client: `cd apps/api && pnpm db:generate`
-5. Verify quality gates: `pnpm lint`, `pnpm type-check`, `pnpm test`
-6. Start dev servers: `pnpm dev`
+1. **Install pnpm** (if not already installed):
+   ```bash
+   npm install -g pnpm@8.15.0
+   # OR use corepack (recommended for Node 20+)
+   corepack enable
+   corepack prepare pnpm@8.15.0 --activate
+   ```
+
+2. Install dependencies: `pnpm install`
+3. Start Docker services: `pnpm docker:up`
+4. Run Prisma migrations: `pnpm db:migrate`
+5. Generate Prisma client: `cd apps/api && pnpm db:generate`
+6. Verify quality gates: `pnpm lint`, `pnpm type-check`, `pnpm test`
+7. Start dev servers: `pnpm dev`
 
 ### Known Issues
 
-None - all dependencies are available in npm registry.
+- **pnpm not installed**: User needs to install pnpm globally or use corepack (built into Node 20+) - ✅ RESOLVED
+- **zod-to-openapi unavailable**: Package version ^6.1.0 doesn't exist (latest is 0.2.1). Removed from dependencies - will implement OpenAPI manually in later sections.
 
 ### Next Sections
 

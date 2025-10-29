@@ -1,28 +1,17 @@
-import { Router } from 'express';
+import { Router, type IRouter } from 'express';
 
 import { prisma } from '../lib/prisma';
 import { redis } from '../lib/redis';
 
-export const healthRouter = Router();
+export const healthRouter: IRouter = Router();
 
 healthRouter.get('/', async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
     await redis.ping();
 
-    res.json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      services: {
-        database: 'up',
-        redis: 'up',
-      },
-    });
+    res.json({ ok: true });
   } catch (error) {
-    res.status(503).json({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    res.status(503).json({ ok: false });
   }
 });
