@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/error-handler';
 import { eventsRouter } from './routes/events';
 import { healthRouter } from './routes/health';
 import { openApiRouter } from './routes/openapi';
+import { partnerRouter } from './routes/partner';
 import { suggestRouter } from './routes/suggest';
 
 export const app: Express = express();
@@ -21,8 +22,9 @@ app.use(pinoHttp({ logger }));
 // Routes
 app.use('/health', healthRouter);
 app.use('/v1/suggest', suggestRouter);
-app.use('/api/events', eventsRouter);
-app.use('/openapi.json', openApiRouter);
+app.use('/v1/partner', partnerRouter);
+app.use('/v1/events', eventsRouter);
+app.use('/', openApiRouter);
 
 // Error handling
 app.use(errorHandler);

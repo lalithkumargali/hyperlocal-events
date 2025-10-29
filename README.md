@@ -172,6 +172,50 @@ PostgreSQL 15 with PostGIS extension for geospatial queries.
 - Events table with location data (geography type)
 - Spatial indexes for efficient proximity searches
 
+## Partner API
+
+The platform provides a Partner API for third-party integrations.
+
+### Authentication
+
+Partner API requires an API key passed via the `x-partner-key` header.
+
+### Rate Limiting
+
+- **Rate limit**: 60 requests per minute per API key
+- **Headers**: `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`
+
+### Example Usage
+
+```bash
+# Get personalized suggestions
+curl -X POST http://localhost:4000/v1/partner/suggest \
+  -H "Content-Type: application/json" \
+  -H "x-partner-key: your-dev-key-here" \
+  -d '{
+    "lat": 37.7749,
+    "lon": -122.4194,
+    "minutesAvailable": 120,
+    "interests": ["music", "food"],
+    "radiusMeters": 5000
+  }'
+```
+
+### Development Setup
+
+Add your dev API key to `.env`:
+
+```env
+PARTNER_API_KEYS=dev-key-12345,another-key-67890
+```
+
+### OpenAPI Documentation
+
+Full API documentation available at:
+
+- Development: http://localhost:4000/
+- Includes partner endpoint specifications
+
 ## Testing
 
 ```bash

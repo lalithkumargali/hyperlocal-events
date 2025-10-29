@@ -203,6 +203,146 @@ const openApiSpec: oas31.OpenAPIObject = {
         },
       },
     },
+    '/v1/partner/suggest': {
+      post: {
+        summary: 'Get personalized suggestions (Partner API)',
+        description:
+          'Partner endpoint for getting personalized suggestions. Requires API key authentication and has rate limiting (60 req/min).',
+        security: [{ ApiKeyAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/SuggestRequest',
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Successful response with suggestions',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/SuggestResponse',
+                },
+              },
+            },
+          },
+          '400': {
+            description: 'Validation error',
+          },
+          '401': {
+            description: 'Unauthorized - Invalid or missing API key',
+          },
+          '429': {
+            description: 'Too Many Requests - Rate limit exceeded (60 req/min)',
+          },
+          '502': {
+            description: 'Service temporarily unavailable',
+          },
+        },
+      },
+    },
+  },
+  components: {
+    securitySchemes: {
+      ApiKeyAuth: {
+        type: 'apiKey',
+        in: 'header',
+        name: 'x-partner-key',
+        description: 'Partner API key for authentication',
+      },
+    },
+    schemas: {
+      SuggestRequest: {
+        type: 'object',
+        required: ['lat', 'lon', 'minutesAvailable'],
+        properties: {
+          lat: {
+            type: 'number',
+            minimum: -90,
+            maximum: 90,
+            description: 'Latitude coordinate',
+            example: 37.7749,
+          },
+          lon: {
+            type: 'number',
+            minimum: -180,
+            maximum: 180,
+            description: 'Longitude coordinate',
+            example: -122.4194,
+          },
+          minutesAvailable: {
+            type: 'integer',
+            minimum: 15,
+            maximum: 360,
+            description: 'Available time in minutes',
+            example: 120,
+          },
+          interests: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'User interests for filtering',
+            example: ['music', 'food', 'sports'],
+          },
+          radiusMeters: {
+            type: 'integer',
+            minimum: 1,
+            default: 5000,
+            description: 'Search radius in meters',
+            example: 5000,
+          },
+          now: {
+            type: 'string',
+            format: 'date-time',
+            description: 'Current time override (ISO 8601)',
+          },
+        },
+      },
+      SuggestResponse: {
+        type: 'array',
+        items: {
+          $ref: '#/components/schemas/Suggestion',
+        },
+      },
+      Suggestion: {
+        type: 'object',
+        required: [
+          'id',
+          'title',
+          'type',
+          'durationMinutes',
+          'distanceMeters',
+          'score',
+          'provider',
+          'providerId',
+        ],
+        properties: {
+          id: { type: 'string' },
+          title: { type: 'string' },
+          type: { type: 'string', enum: ['event', 'place'] },
+          startAt: { type: 'string', format: 'date-time' },
+          endAt: { type: 'string', format: 'date-time' },
+          venue: {
+            type: 'object',
+            properties: {
+              name: { type: 'string' },
+              address: { type: 'string' },
+              lat: { type: 'number' },
+              lon: { type: 'number' },
+            },
+          },
+          durationMinutes: { type: 'number' },
+          distanceMeters: { type: 'number' },
+          score: { type: 'number', minimum: 0, maximum: 1 },
+          provider: { type: 'string' },
+          providerId: { type: 'string' },
+          url: { type: 'string', format: 'uri' },
+        },
+      },
+    },
   },
 };
 

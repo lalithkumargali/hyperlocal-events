@@ -576,3 +576,55 @@ API /v1/suggest → MCP Client → pipeline.suggest → Response
 - ✅ API integration working
 - ✅ Fixture-based results display
 - ✅ Responsive layout
+
+## Section K - Public Partner API
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ Partner endpoint `/v1/partner/suggest`
+- ✅ API key authentication middleware
+- ✅ Rate limiting (60 req/min per key)
+- ✅ Usage logging
+- ✅ OpenAPI documentation updated
+- ✅ README with cURL examples
+
+**Features:**
+
+**Authentication:**
+
+- Header-based: `x-partner-key`
+- Simple key validation (env variable)
+- Ready for database table in production
+- Unauthorized (401) on missing/invalid key
+
+**Rate Limiting:**
+
+- 60 requests per minute per API key
+- express-rate-limit middleware
+- Standard headers: RateLimit-\*
+- 429 Too Many Requests on limit exceeded
+- Per-key tracking (not per IP)
+
+**Logging:**
+
+- All partner requests logged
+- Includes: API key (masked), path, method
+- Analytics-ready format
+- Pino structured logging
+
+**OpenAPI Spec:**
+
+- `/v1/partner/suggest` documented
+- Security scheme: ApiKeyAuth
+- Shared schemas for request/response
+- Rate limit responses documented
+
+**Quality Gates:**
+
+- ✅ API key authentication working
+- ✅ Rate limiting enforced
+- ✅ OpenAPI spec includes partner endpoint
+- ✅ README has cURL example
+- ✅ Works with dev key from .env

@@ -1,0 +1,109 @@
+feat(api): partner suggest endpoint + rate limits + docs
+
+Implement public Partner API with API key authentication, rate limiting, usage logging, and comprehensive documentation.
+
+Partner Endpoint:
+- POST /v1/partner/suggest
+- Same functionality as /v1/suggest
+- Requires API key authentication
+- Rate limited to 60 req/min per key
+- Full OpenAPI documentation
+
+Authentication:
+- Header-based: x-partner-key
+- Simple validation against PARTNER_API_KEYS env variable
+- Returns 401 Unauthorized on missing/invalid key
+- Masked key logging for security
+- Ready for database table in production
+
+Rate Limiting:
+- 60 requests per minute per API key
+- Uses express-rate-limit middleware
+- Per-key tracking (not per IP)
+- Standard headers:
+  - RateLimit-Limit: 60
+  - RateLimit-Remaining: X
+  - RateLimit-Reset: timestamp
+- Returns 429 Too Many Requests on limit exceeded
+
+Usage Logging:
+- All partner requests logged with Pino
+- Includes:
+  - Masked API key (first 8 chars + ...)
+  - Request path and method
+  - Timestamp
+- Analytics-ready structured format
+- Separate from general API logs
+
+OpenAPI Documentation:
+- /v1/partner/suggest fully documented
+- Security scheme: ApiKeyAuth
+  - Type: apiKey
+  - In: header
+  - Name: x-partner-key
+- Shared schemas (SuggestRequest, SuggestResponse, Suggestion)
+- Response codes:
+  - 200: Success
+  - 400: Validation error
+  - 401: Unauthorized
+  - 429: Rate limit exceeded
+  - 502: Service unavailable
+
+README Documentation:
+- Partner API section added
+- Authentication explained
+- Rate limiting details
+- Complete cURL example
+- Development setup instructions
+- OpenAPI docs reference
+
+Files Created:
+- apps/api/src/middleware/api-key.ts - API key authentication
+- apps/api/src/middleware/rate-limit.ts - Rate limiting
+- apps/api/src/routes/partner.ts - Partner routes
+
+Files Modified:
+- apps/api/src/app.ts - Register partner routes
+- apps/api/src/routes/openapi.ts - Add partner endpoint docs
+- README.md - Add Partner API section
+- .env.example - Add PARTNER_API_KEYS
+
+Dependencies Added:
+- express-rate-limit - Rate limiting middleware
+
+Environment Variables:
+- PARTNER_API_KEYS - Comma-separated list of valid API keys
+- Example: dev-key-12345,prod-key-67890
+
+Example Usage:
+```bash
+curl -X POST http://localhost:4000/v1/partner/suggest \
+  -H "Content-Type: application/json" \
+  -H "x-partner-key: dev-key-12345" \
+  -d '{
+    "lat": 37.7749,
+    "lon": -122.4194,
+    "minutesAvailable": 120,
+    "interests": ["music", "food"],
+    "radiusMeters": 5000
+  }'
+```
+
+Security Features:
+- API key validation
+- Rate limiting per key
+- Masked logging
+- Standard HTTP status codes
+- Comprehensive error messages
+
+Production Considerations:
+- Replace env variable with database table
+- Add partner metadata (name, tier, etc.)
+- Implement tiered rate limits
+- Add usage analytics dashboard
+- Consider API key rotation
+
+Acceptance: ✅ Example cURL works with a dev key from .env
+Test: Set PARTNER_API_KEYS=dev-key-12345 in .env
+Run: curl with x-partner-key: dev-key-12345
+Result: Returns suggestions, enforces rate limits
