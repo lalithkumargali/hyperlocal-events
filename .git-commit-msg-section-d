@@ -1,0 +1,43 @@
+feat(api): /health and /v1/suggest with OpenAPI
+
+Implement minimal REST API with OpenAPI documentation and Zod validation.
+
+Endpoints:
+- GET /health → {ok: true}
+  Health check endpoint with database and Redis connectivity check
+
+- POST /v1/suggest → Suggestion[]
+  Personalized event/place suggestions based on location, time, and interests
+  Input: lat, lon, minutesAvailable, interests?, radiusMeters?, now?
+  Output: Array of suggestions with venue, distance, duration, score
+  
+- GET /openapi.json → OpenAPI 3.1 spec
+  Complete API documentation with request/response schemas
+
+Features:
+- Zod validation for all request bodies
+- Comprehensive error handling (400 for validation, 502 for MCP failures)
+- Deterministic mock suggestions (3 events/places from SF)
+- OpenAPI 3.1 specification with examples
+- Ready for MCP server integration in Section E
+
+Mock Suggestions:
+- Summer Music Festival (Golden Gate Park, score: 0.95)
+- Tech Innovation Summit 2025 (Tech Hub, score: 0.88)
+- The Grand Theater (place, score: 0.72)
+
+Filtering:
+- By distance (radiusMeters)
+- By available time (minutesAvailable)
+- By interests (future: will use event categories)
+- Sorted by score (descending)
+
+Validation:
+- lat: -90 to 90
+- lon: -180 to 180  
+- minutesAvailable: 15 to 360
+- radiusMeters: positive integer (default: 5000)
+- now: ISO 8601 datetime (optional)
+
+Acceptance: ✅ curl -X POST :4000/v1/suggest returns deterministic mock suggestions
+Test script: ./test-api.sh

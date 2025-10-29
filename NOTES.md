@@ -120,3 +120,60 @@ All required packages are available:
 - ✅ `pnpm prisma:migrate` - PASSED (tables created)
 - ✅ `pnpm prisma:seed` - PASSED (data seeded)
 - ✅ Database tables exist and contain data
+
+## Section D - API Service
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ Implemented REST API with Zod validation
+- ✅ Created GET /health endpoint (returns {ok: true})
+- ✅ Created POST /v1/suggest endpoint with full validation
+- ✅ Added OpenAPI 3.1 specification at GET /openapi.json
+- ✅ Deterministic mock suggestions (until MCP wired in Section E)
+
+**Endpoints:**
+
+1. **GET /health** - Health check
+   - Returns: `{ok: true}` or `{ok: false}` (503)
+
+2. **POST /v1/suggest** - Get personalized suggestions
+   - Input: lat, lon, minutesAvailable, interests?, radiusMeters?, now?
+   - Output: Array of Suggestion objects
+   - Validation: Zod schemas with proper error handling
+   - Mock data: 3 deterministic suggestions (events + places)
+
+3. **GET /openapi.json** - OpenAPI 3.1 specification
+   - Complete API documentation
+   - Request/response schemas
+   - Example values
+
+**Request Schema:**
+
+- lat: number (-90 to 90)
+- lon: number (-180 to 180)
+- minutesAvailable: number (15-360)
+- interests: string[] (optional)
+- radiusMeters: number (default: 5000)
+- now: ISO datetime string (optional)
+
+**Response Schema:**
+
+- id, title, type (event|place)
+- startAt?, endAt? (ISO datetime)
+- venue? (name, address?, lat, lon)
+- durationMinutes, distanceMeters
+- score (0-1), provider, providerId, url?
+
+**Error Handling:**
+
+- 400: Validation errors (Zod)
+- 502: MCP server unavailable (future)
+
+**Quality Gates:**
+
+- ✅ Zod validation working
+- ✅ OpenAPI spec generated
+- ✅ Mock suggestions deterministic
+- ✅ Ready for MCP integration (Section E)
