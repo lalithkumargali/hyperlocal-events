@@ -1,4 +1,5 @@
 import { logger } from './logger';
+import { mcpCallsTotal, mcpCallDuration } from './metrics';
 
 /**
  * MCP Client for calling MCP server tools
@@ -23,6 +24,7 @@ interface MCPResponse<T = unknown> {
  */
 export async function callMCPTool<T = unknown>(options: MCPCallOptions): Promise<MCPResponse<T>> {
   const { tool, arguments: args } = options;
+  const startTime = Date.now();
 
   logger.info({ tool, args }, 'Calling MCP tool');
 
@@ -33,6 +35,12 @@ export async function callMCPTool<T = unknown>(options: MCPCallOptions): Promise
 
     if (tool === 'pipeline.suggest') {
       const result = await pipelineSuggest(args);
+
+      // Track metrics
+      const duration = (Date.now() - startTime) / 1000;
+      mcpCallsTotal.labels(tool, 'success').inc();
+      mcpCallDuration.labels(tool).observe(duration);
+
       return {
         success: true,
         data: result as T,
@@ -41,6 +49,9 @@ export async function callMCPTool<T = unknown>(options: MCPCallOptions): Promise
 
     throw new Error(`Unknown MCP tool: ${tool}`);
   } catch (error) {
+    // Track failure
+    mcpCallsTotal.labels(tool, 'error').inc();
+
     logger.error({ error, tool }, 'MCP tool call failed');
     return {
       success: false,

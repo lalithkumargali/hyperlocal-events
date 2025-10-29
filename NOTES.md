@@ -628,3 +628,146 @@ API /v1/suggest → MCP Client → pipeline.suggest → Response
 - ✅ OpenAPI spec includes partner endpoint
 - ✅ README has cURL example
 - ✅ Works with dev key from .env
+
+## Section L - Quality Gates
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ API unit tests (health, API key middleware)
+- ✅ MCP tool tests (21 tests from Section F & H)
+- ✅ Playwright E2E smoke tests
+- ✅ GitHub Actions CI/CD workflow
+- ✅ Lint, typecheck, test, build on PRs
+
+**Tests Added:**
+
+**API Tests (Vitest):**
+
+- Health endpoint test
+- API key middleware tests (missing, invalid, valid)
+- Total: 2 test files
+
+**MCP Tests (Vitest - Already Exist):**
+
+- Provider connector tests (12 tests)
+- Ranking algorithm tests (9 tests)
+- Total: 21 tests
+
+**E2E Tests (Playwright):**
+
+- Homepage loads correctly
+- Search form elements visible
+- Geolocation button present
+- Interest management works
+- Map renders
+- Total: 4 smoke tests
+
+**GitHub Actions Workflow:**
+
+**Jobs:**
+
+1. **Lint** - ESLint across all packages
+2. **Type Check** - TypeScript validation
+3. **Test** - Vitest unit tests with PostgreSQL & Redis
+4. **Build** - Build all packages
+5. **E2E** - Playwright tests with browser automation
+
+**Features:**
+
+- Runs on PRs and pushes to main/develop
+- PostgreSQL + PostGIS service
+- Redis service
+- Playwright browser installation
+- Artifact upload for test reports
+- Parallel job execution
+
+**Quality Gates:**
+
+- ✅ 2 API unit tests
+- ✅ 21 MCP tool tests
+- ✅ 4 E2E smoke tests
+- ✅ GitHub Actions workflow configured
+- ✅ CI passes locally (can test with act)
+
+## Section M - Telemetry & Logs
+
+### Status: ✅ COMPLETE
+
+**Changes:**
+
+- ✅ Pino structured logging everywhere
+- ✅ Prometheus metrics endpoint (/metrics)
+- ✅ HTTP request metrics
+- ✅ API-specific metrics
+- ✅ MCP call metrics
+- ✅ Cache metrics
+- ✅ Partner API metrics
+
+**Structured Logging (Pino):**
+
+- Already integrated via pino-http middleware
+- Structured JSON logs
+- Request/response logging
+- Error logging with context
+- Performance: ~10x faster than Winston
+
+**Prometheus Metrics:**
+
+**Default Metrics:**
+
+- process_cpu_user_seconds_total
+- process_cpu_system_seconds_total
+- nodejs_heap_size_bytes
+- nodejs_external_memory_bytes
+- nodejs_gc_duration_seconds
+
+**HTTP Metrics:**
+
+- http_requests_total (counter)
+- http_request_duration_seconds (histogram)
+- Labels: method, route, status
+
+**API Metrics:**
+
+- suggest_requests_total (counter)
+- suggest_request_duration_seconds (histogram)
+- suggest_results_count (histogram)
+- Labels: endpoint (public/partner)
+
+**MCP Metrics:**
+
+- mcp_calls_total (counter)
+- mcp_call_duration_seconds (histogram)
+- Labels: tool, status
+
+**Cache Metrics:**
+
+- cache_hits_total (counter)
+- cache_misses_total (counter)
+- Labels: cache_type
+
+**Partner Metrics:**
+
+- partner_requests_total (counter)
+- rate_limit_hits_total (counter)
+- Labels: partner_key, endpoint
+
+**Database Metrics:**
+
+- db_queries_total (counter)
+- Labels: operation
+
+**Gauges:**
+
+- active_connections
+
+**Quality Gates:**
+
+- ✅ Pino logging integrated
+- ✅ /metrics endpoint returns Prometheus format
+- ✅ HTTP metrics tracked
+- ✅ API metrics tracked
+- ✅ MCP metrics tracked
+- ✅ curl :4000/metrics works

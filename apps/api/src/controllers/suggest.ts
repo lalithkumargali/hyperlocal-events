@@ -3,13 +3,20 @@ import { Request, Response } from 'express';
 
 import { callMCPTool } from '../lib/mcp-client';
 import { logger } from '../lib/logger';
+import { suggestRequestsTotal, suggestRequestDuration, suggestResultsCount } from '../lib/metrics';
 
 /**
  * POST /v1/suggest
  * Get personalized event/place suggestions based on location, time, and interests
  */
 export async function suggestController(req: Request, res: Response): Promise<void> {
+  const endpoint = req.path.includes('partner') ? 'partner' : 'public';
+  const startTime = Date.now();
+
   try {
+    // Track request
+    suggestRequestsTotal.labels(endpoint).inc();
+
     // Validate request body
     const input = SuggestRequestSchema.parse(req.body);
 
@@ -46,6 +53,11 @@ export async function suggestController(req: Request, res: Response): Promise<vo
     const validatedSuggestions = SuggestResponseSchema.parse(suggestions);
 
     logger.info({ count: validatedSuggestions.length }, 'Successfully processed suggestions');
+
+    // Track metrics
+    const duration = (Date.now() - startTime) / 1000;
+    suggestRequestDuration.labels(endpoint).observe(duration);
+    suggestResultsCount.observe(validatedSuggestions.length);
 
     res.json(validatedSuggestions);
   } catch (error) {
