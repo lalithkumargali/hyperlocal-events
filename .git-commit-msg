@@ -1,0 +1,27 @@
+chore: scaffold monorepo, web/api/mcp packages, base configs
+
+Initialize pnpm workspace with turbo monorepo for MCP-powered hyperlocal events app.
+
+Apps:
+- apps/web: Next.js 15 + App Router + Tailwind CSS + shadcn/ui (port 3000)
+- apps/api: Express + Prisma + Redis + BullMQ (port 4000)
+
+Packages:
+- packages/mcp-server: @modelcontextprotocol/sdk with custom tools
+- packages/ui: shadcn/ui Button and Card components
+- packages/core: Shared Zod schemas, types, and utilities
+- packages/config: ESLint, TypeScript, and Tailwind configs
+
+Infrastructure:
+- Docker Compose: PostgreSQL 15 + PostGIS, Redis 7
+- Prisma schema with geospatial support
+- Multi-stage Dockerfiles for production builds
+
+Features:
+- Health check endpoint: GET /health -> {ok:true}
+- Minimal landing page with Lucide icons
+- Structured logging with Pino
+- Security middleware (Helmet, CORS)
+- Workspace scripts: dev, build, lint, type-check, test, format
+
+Quality gates: ✅ lint, ✅ type-check, ✅ build, ✅ format

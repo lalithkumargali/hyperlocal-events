@@ -46,40 +46,47 @@ MCP-powered hyperlocal events discovery platform built with a modern full-stack 
 ### Installation
 
 1. **Clone and install dependencies**:
+
    ```bash
    pnpm install
    ```
 
 2. **Set up environment variables**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 3. **Start infrastructure (PostgreSQL + Redis)**:
+
    ```bash
    pnpm docker:up
    ```
 
 4. **Run database migrations**:
+
    ```bash
    pnpm db:migrate
    ```
 
 5. **Generate Prisma client**:
+
    ```bash
    cd apps/api && pnpm db:generate
    ```
 
 6. **Start development servers**:
+
    ```bash
    pnpm dev
    ```
 
    This will start:
-   - API server: http://localhost:3001
    - Web app: http://localhost:3000
-   - OpenAPI docs: http://localhost:3001/api-docs
+   - API server: http://localhost:4000
+   - Health check: http://localhost:4000/health
+   - OpenAPI docs: http://localhost:4000/api-docs
 
 ## Development Commands
 
@@ -130,6 +137,7 @@ pnpm --filter @hyperlocal/core build
 ## Architecture
 
 ### API Service (`apps/api`)
+
 - Express REST API with OpenAPI documentation
 - Prisma ORM for database access
 - Redis for caching and job queues (BullMQ)
@@ -137,17 +145,20 @@ pnpm --filter @hyperlocal/core build
 - Zod for validation
 
 ### MCP Server (`packages/mcp-server`)
+
 - Model Context Protocol server
 - Custom tools for event providers, ranking, etc.
 - Integrates with API service
 
 ### Web App (`apps/web`)
+
 - Next.js 15 with App Router
 - Tailwind CSS + shadcn/ui components
 - MapLibre GL for maps
 - Server and client components
 
 ### Shared Packages
+
 - **core**: Types, schemas, utilities
 - **ui**: Reusable UI components
 - **config**: Shared configuration
@@ -157,6 +168,7 @@ pnpm --filter @hyperlocal/core build
 PostgreSQL 15 with PostGIS extension for geospatial queries.
 
 ### Schema
+
 - Events table with location data (geography type)
 - Spatial indexes for efficient proximity searches
 

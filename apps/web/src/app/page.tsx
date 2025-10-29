@@ -11,9 +11,7 @@ export default function Home(): JSX.Element {
         <p className="text-xl text-muted-foreground text-center">
           Discover amazing events happening near you
         </p>
-        <div className="text-sm text-muted-foreground">
-          MCP-powered event discovery platform
-        </div>
+        <div className="text-sm text-muted-foreground">MCP-powered event discovery platform</div>
       </div>
     </main>
   );

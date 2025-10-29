@@ -5,6 +5,7 @@
 ### Status: ✅ COMPLETE
 
 **Quality Gates:**
+
 - ✅ `pnpm lint` - PASSED (warnings only, no errors)
 - ✅ `pnpm type-check` - PASSED
 - ⚠️ `pnpm test` - No test files yet (expected for scaffold)
@@ -14,6 +15,7 @@
 All scaffold files created. Next steps:
 
 1. **Install pnpm** (if not already installed):
+
    ```bash
    npm install -g pnpm@8.15.0
    # OR use corepack (recommended for Node 20+)
@@ -44,6 +46,7 @@ All scaffold files created. Next steps:
 ## Dependencies Status
 
 All required packages are available:
+
 - ✅ @modelcontextprotocol/sdk
 - ✅ Next.js 15
 - ✅ Prisma with PostgreSQL

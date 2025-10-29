@@ -3,12 +3,7 @@ import { ZodError } from 'zod';
 
 import { logger } from '../lib/logger';
 
-export function errorHandler(
-  err: Error,
-  _req: Request,
-  res: Response,
-  _next: NextFunction
-): void {
+export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction): void {
   logger.error({ err }, 'Request error');
 
   if (err instanceof ZodError) {
